@@ -62,17 +62,27 @@ def step(playground: Map, guard: Guard) -> Guard|None:
 def run_steps(playground: Map, guard: Guard|None):
     turn = 0
     places = set()
-    while guard is not None:
+    guard_positions = set()
+    while (guard is not None) and not (guard in guard_positions):
         places.add(guard.position)
+        guard_positions.add(guard)
         turn += 1
         guard = step(playground, guard)
-        print(turn, guard)
-    print(places, len(places))
+    return guard is not None, places
 
 
 def main():
     playground, guard = parse_input(sys.stdin)
-    run_steps(playground, guard)
+    _, places = run_steps(playground, guard)
+    print(len(places))
+
+    circles = set()
+    for num, candidate in enumerate(places):
+        print(num/len(places))
+        if (candidate != guard.position) and (candidate not in playground.obstacles):
+            if run_steps(Map(obstacles=playground.obstacles|{candidate}, width=playground.width, height=playground.height), guard)[0]:
+                circles.add(candidate)
+    print(circles, len(circles))
 
 if __name__ == "__main__":
     main()
