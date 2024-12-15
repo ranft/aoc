@@ -25,13 +25,30 @@ def check_many_record(result: int, a:int, b: int, *remainder: list[int]):
         return check_many_record(result, a+b, remainder[0], *new_rem) or check_many_record(result, a*b, remainder[0], *new_rem)
     return check_two_record(result, a, b)
 
+
+def concat(a: int, b: int) -> int:
+    result = int(str(a)+str(b))
+    return result
+
+def check_two_record_b(result: int, a:int, b: int):
+    return (result == a+b) or (result == a*b) or (result == concat(a, b))
+
+
+def check_many_record_b(result: int, a:int, b: int, *remainder: list[int]):
+    if remainder:
+        new_rem = remainder[1:]
+        return (
+                check_many_record_b(result, a+b, remainder[0], *new_rem)  
+           or check_many_record_b(result, a*b, remainder[0], *new_rem)
+           or check_many_record_b(result, concat(a, b), remainder[0], *new_rem)
+        )
+    return check_two_record_b(result, a, b)
+
+
 def main():
     records = parse(sys.stdin)
-    total = 0
-    for rec in records:
-        if check_many_record(rec.result, *rec.numbers):
-            total += rec.result
-    print(total)
+    print(sum(rec.result for rec in records if check_many_record(rec.result, *rec.numbers)))
+    print(sum(rec.result for rec in records if check_many_record_b(rec.result, *rec.numbers)))
 
 
 if __name__ == "__main__":
